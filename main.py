@@ -5,6 +5,7 @@ import sys
 
 # src:
 import src.world as world
+from src.player import Player
 
 # The main game class that is intantiated on startup:
 # see https://github.com/lukasz1985/SREM/blob/master/main.py
@@ -22,6 +23,9 @@ class Game:
         # World creation:
         self.world = world.World(self)
         
+        # Player control object:
+        self.player = Player(self, spawn_x=150 + 2.5, spawn_y=100 - 5)
+
         # Utilities:
         self.done = False  # A flag for the game loop indicating if the game is done playing.
         self.clock = pygame.time.Clock() # Clock to control the framerate
@@ -39,6 +43,8 @@ class Game:
 
             # LOGICAL UPDATES #################################################
 
+            self.update()
+
             ###################################################################
 
             # RENDER GRAPHICS #################################################
@@ -50,8 +56,13 @@ class Game:
             #self.update(self.clock)
             self.clock.tick(60)
 
-    def update(self, clock):
-        pass#pygame.display.update()
+    def update(self):
+
+        # Moving player:
+        # Get all keys currently pressed, and move when an arrow key is held
+        keys = pygame.key.get_pressed()
+        self.player.move(keys)
+
 
     def draw(self):
         self.display.fill((35,35,35))
@@ -63,7 +74,7 @@ class Game:
                 self.display.blit(self.world.sprites_maps['grass'], (150 + x * 10 - y * 10, 100 + x * 5 + y * 5))
                 #if random.randint(0, 1):
                 #    display.blit(grass_img, (150 + x * 10 - y * 10, 100 + x * 5 + y * 5 - 14))
-                self.display.blit(self.world.sprites_player['player_0'], (150 + 2.5, 100 - 5))
+                self.display.blit(self.player.sprites['player_0'], (self.player.x, self.player.y))
 
         self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
         #pygame.display.update()

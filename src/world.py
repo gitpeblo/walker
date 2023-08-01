@@ -12,7 +12,6 @@ class World:
         
         self.load_map('data/maps/map_test.txt')
         self.load_sprites_maps('data/images/sprites/maps')
-        self.load_sprites_player('data/images/sprites/player')
 
     def load_map(self, path_to_map):
         f = open(path_to_map)
@@ -35,14 +34,6 @@ class World:
             sprite_name = filename.split('/')[-1].split('.')[0]
             self.sprites_maps[sprite_name] = sprite
 
-    def load_sprites_player(self, path_sprites_player):
-        self.sprites_player = {}
-        for filename in glob.glob(path_sprites_player + '/*.png'):
-            sprite = pygame.image.load(filename).convert()
-            sprite.set_colorkey((0, 0, 0))
-
-            sprite_name = filename.split('/')[-1].split('.')[0]
-            self.sprites_player[sprite_name] = sprite
 
 
 
