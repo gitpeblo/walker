@@ -41,7 +41,7 @@ class Player:
         return sprites
 
 
-    def move(self, keys, speed=2):
+    def move(self, keys, speed=1):
 
         if keys[pygame.K_UP]:
             self.y -= speed
