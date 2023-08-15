@@ -1,0 +1,4 @@
+# stride_dx = stride along the screen's x-axis to aling a tile with the contiguous one
+# stride_dx = stride along the screen's y-axis to aling a tile with the contiguous one
+stride_dx,stride_dy
+10,5
