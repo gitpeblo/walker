@@ -4,11 +4,11 @@ import glob
 
 class Player:
 
-    def __init__(self, main, spawn_x=0, spawn_y=0):
+    def __init__(self, main, spawn_x_map=0, spawn_y_map=0):
         self.main = main
         # Current sprite:
-        self.x = spawn_x
-        self.y = spawn_y
+        self.x_map = spawn_x_map
+        self.y_map = spawn_y_map
         # position (initialized to spawn)
         self.sprite = None
         # object
@@ -40,28 +40,18 @@ class Player:
         
         return sprites
 
-
-    def move(self, keys, speed=1):
+    def move(self, keys, speed=0.1):
 
         if keys[pygame.K_UP]:
-            self.y -= speed
+            self.x_map -= speed
+            self.y_map -= speed
         if keys[pygame.K_DOWN]:
-            self.y += speed
+            self.x_map += speed
+            self.y_map += speed
         if keys[pygame.K_LEFT]:
-            self.x -= speed
+            self.x_map -= speed
+            self.y_map += speed
         if keys[pygame.K_RIGHT]:
-            self.x += speed
-
-        WIDTH, HEIGHT = pygame.display.get_window_size()
-
-        # Controlling the object such that it cannot leave the screen's viewpoint:
-        if self.x > WIDTH:
-            self.x = 0
-        if self.y > HEIGHT - self.height:
-            self.y = 0
-        if self.x < self.width:
-            self.x = WIDTH
-        if self.y < 0:
-            self.y = HEIGHT - self.height
-
+            self.x_map += speed
+            self.y_map -= speed
 
