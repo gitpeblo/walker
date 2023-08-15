@@ -7,6 +7,7 @@ import sys
 import src.world as world
 from src.player import Player
 from src.utils import coords_map_to_screen, coords_map_to_mini
+from src.utils import check_player_on_tile
 
 # The main game class that is intantiated on startup:
 # see https://github.com/lukasz1985/SREM/blob/master/main.py
@@ -64,7 +65,6 @@ class Game:
             self.clock.tick(60)
 
     def update(self):
-        print('::::::::', self.player.x_map, self.player.y_map)
 
         # Moving player:
         # Get all keys currently pressed, and move when an arrow key is held
@@ -72,10 +72,8 @@ class Game:
         self.player.move(keys)
 
         # Checking if the player is over a hole:
-        # player position
-#        print(self.display.get_at((int(self.player.x),
-#                                   int(self.player.y)))[:3])
-        # RGB value of layer at player's position (dropping alpha)
+        self.player.on_tile = check_player_on_tile(self.player, self.world)
+        self.player.drop(self.player.on_tile)
 
     def draw(self):
         self.display.fill((35,35,35))
@@ -86,35 +84,36 @@ class Game:
             # there is a "1" in the map
 
                 # Minimap:
-                box_dx_mini, box_dy_mini = 5, 5
+                box_dx_mini, box_dy_mini = 7, 7
                 # minimap box sizes
                 pygame.draw.rect(self.display, (255, 255, 255),\
-                    pygame.Rect(x_map*box_dx_mini, y_map*box_dy_mini, box_dx_mini, box_dy_mini), 1)
+                    pygame.Rect(x_map*box_dx_mini, y_map*box_dy_mini,\
+                                box_dx_mini, box_dy_mini), 1)
                 # displaying minimap boxes
-
-                player_x, player_y = coords_map_to_screen(\
-                        self.player.x_map, self.player.y_map,\
-                        self.offset_x, self.offset_y,\
-                        self.world.sprites_maps_meta['grass'], type='player',\
-                        world=self.world, player=self.player)
-
-                player_x_mini, player_y_mini = coords_map_to_mini(\
-                    self.player.x_map, self.player.y_map, box_dx_mini, box_dy_mini)
-                
-                pygame.draw.circle(self.display, 'red',\
-                                   (player_x_mini, player_y_mini), 3, 1)
-                # displaying player location on minimap
 
                 x_tile, y_tile = coords_map_to_screen(x_map, y_map,\
                     self.offset_x, self.offset_y, self.world.sprites_maps_meta['grass'])
                 
                 self.display.blit(self.world.sprites_maps['grass'],\
-                                  (x_tile, y_tile))
+                                    (x_tile, y_tile))
                 # debug : Show rectangle around each tile:
                 #pygame.draw.rect(self.display, (255, 255, 255),\
                 #    pygame.Rect(x_tile, y_tile, 20, 24), 1)
-                
-                self.display.blit(self.player.sprites['player_0'], (player_x, player_y))
+
+            player_x, player_y = coords_map_to_screen(\
+                    self.player.x_map, self.player.y_map,\
+                    self.offset_x, self.offset_y,\
+                    self.world.sprites_maps_meta['grass'], type='player',\
+                    world=self.world, player=self.player)
+
+            # Displaying player location on minimap:
+            player_x_mini, player_y_mini = coords_map_to_mini(\
+                self.player.x_map, self.player.y_map, box_dx_mini, box_dy_mini)
+            
+            pygame.draw.circle(self.display, 'red',\
+                                (player_x_mini, player_y_mini), 3, 1)
+            
+            self.display.blit(self.player.sprites['player_0'], (player_x, player_y))
                 
         self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
         #pygame.display.update()

@@ -9,6 +9,7 @@ class Player:
         # Current sprite:
         self.x_map = spawn_x_map
         self.y_map = spawn_y_map
+        self.z_map = 0
         # position (initialized to spawn)
         self.sprite = None
         # object
@@ -17,6 +18,7 @@ class Player:
         self.height = None
         self.width = None
         # size
+        self.on_tile = None
 
         # Loading all sprites:
         self.sprites = self.load_sprites_player('data/images/sprites/player')
@@ -54,4 +56,10 @@ class Player:
         if keys[pygame.K_RIGHT]:
             self.x_map += speed
             self.y_map -= speed
+
+    def drop(self, on_tile, speed=0.5):
+        if not on_tile:
+            self.x_map += speed
+            self.y_map += speed
+   
 

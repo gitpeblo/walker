@@ -55,6 +55,38 @@ def coords_map_to_mini(x_map, y_map, box_dx_mini, box_dy_mini):
 
     return x_mini, y_mini
 
+def check_player_on_tile(player, world):
+    '''Checks if player is on a tile (any tile).'''
+
+    if player.z_map < 0: return False
+    # player is already free-falling
+
+    player_on_tile = False
+
+    # Iterating over tiles, checking there is one under the player:
+    for y_map, x_map in world.coordinates:
+        
+        if world.map_data[y_map][x_map]:
+        # there is a "1" in the map
+
+            #print('........', x_map, y_map)
+            #print('........', player.x_map, player.y_map)
+
+            # NOTE: Tile e.g. (0, 0) ranges between -0.5 and 0.5 in both axes 
+            if x_map - 0.5 <= player.x_map < x_map + 0.5 and\
+               y_map - 0.5 <= player.y_map < y_map + 0.5:
+            # A tile has been found under the player! -- interrupting search
+                player_on_tile = True
+    
+    if not player_on_tile:
+        player.z_map = -999
+        # setting player to free-fall
+        # debug: print('Player off tile')
+    # debug: if player_on_tile:
+    #    print('Player on tile')
+
+    return player_on_tile
+
 """
 def coords_screen_to_map(x, y, offset_x, offset_y, sprite_stride_dx, sprite_stride_dy):    
 
