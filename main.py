@@ -41,14 +41,15 @@ class Game:
     def loop(self):
         while not self.done:
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+            self.events = pygame.event.get()
+            for event in self.events:
+               if event.type == pygame.QUIT:
                     self.done = True
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-
+            
             # LOGICAL UPDATES #################################################
 
             self.update()
@@ -66,14 +67,17 @@ class Game:
 
     def update(self):
 
-        # Moving player:
-        # Get all keys currently pressed, and move when an arrow key is held
         keys = pygame.key.get_pressed()
+
+        # Moving player:
         self.player.move(keys)
 
         # Checking if the player is over a hole:
         self.player.on_tile = check_player_on_tile(self.player, self.world)
         self.player.drop(self.player.on_tile)
+
+        # Checking if the player has to be moved through waypoints:
+        self.player.move_to(self.events, [[4, 4], [6, 4]])
 
     def draw(self):
         self.display.fill((35,35,35))
@@ -83,14 +87,16 @@ class Game:
             if self.world.map_data[y_map][x_map]:
             # there is a "1" in the map
 
-                # Minimap:
+                # Minimap -----------------------------------------------------
                 box_dx_mini, box_dy_mini = 7, 7
                 # minimap box sizes
                 pygame.draw.rect(self.display, (255, 255, 255),\
                     pygame.Rect(x_map*box_dx_mini, y_map*box_dy_mini,\
                                 box_dx_mini, box_dy_mini), 1)
                 # displaying minimap boxes
+                #--------------------------------------------------------------
 
+                # Map ---------------------------------------------------------
                 x_tile, y_tile = coords_map_to_screen(x_map, y_map,\
                     self.offset_x, self.offset_y, self.world.sprites_maps_meta['grass'])
                 
@@ -99,7 +105,9 @@ class Game:
                 # debug : Show rectangle around each tile:
                 #pygame.draw.rect(self.display, (255, 255, 255),\
                 #    pygame.Rect(x_tile, y_tile, 20, 24), 1)
+                #--------------------------------------------------------------
 
+            # Player ----------------------------------------------------------
             player_x, player_y = coords_map_to_screen(\
                     self.player.x_map, self.player.y_map,\
                     self.offset_x, self.offset_y,\
@@ -114,6 +122,7 @@ class Game:
                                 (player_x_mini, player_y_mini), 3, 1)
             
             self.display.blit(self.player.sprites['player_0'], (player_x, player_y))
+            #------------------------------------------------------------------
                 
         self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
         #pygame.display.update()

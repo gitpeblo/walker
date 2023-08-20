@@ -1,6 +1,8 @@
 import pygame
+from pygame.locals import * # keys
 
 import glob
+import math
 
 class Player:
 
@@ -19,6 +21,9 @@ class Player:
         self.width = None
         # size
         self.on_tile = None
+        # is player on a tile?
+        self.status = 'idle'
+        # either of ['idle', 'moving_to']
 
         # Loading all sprites:
         self.sprites = self.load_sprites_player('data/images/sprites/player')
@@ -61,5 +66,54 @@ class Player:
         if not on_tile:
             self.x_map += speed
             self.y_map += speed
-   
+    
+    def move_through(self, waypoints):
+        pass
+
+    def move_to(self, events, waypoints=[[0, 0]], speed=0.1):
+        '''Moves the player through a list of waypoints.
+        
+        Parameters
+        ----------
+        events : list
+            List of events as returned by pygame.event.get()
+        waypoints : list, optional (default: [[0, 0]])
+            List of tuples [x_map, y_map], where each tuple is an intermediate
+            target to go through.
+        speed : float
+            Cruising speed.
+        '''
+
+        # Checking wether to initiate a "move to":
+        for event in events:
+            if event.type == KEYDOWN:
+                if event.key == K_RETURN:
+                    print('move_to:: Initiating movement')
+                    self.status = 'moving_to'
+
+        if self.status == 'moving_to':
+            for  [x_target_map, y_target_map] in waypoints:
+
+                print('====', x_target_map, y_target_map)
+
+                # Calculating direction of movement:
+                dx = x_target_map - self.x_map
+                dy = y_target_map - self.x_map
+                d = (dx**2 + dy**2)**0.5
+                theta = math.atan2(dy, dx)
+
+                if self.status == 'moving_to':
+
+                    if d > speed:
+                    # NOTE: `d` and `speed` have the same units of space, here, because
+                    #        the speed is implictly multiplied by the clock tick.
+                        print('\tmove_to:: Taking a step')
+                        self.x_map += speed * math.cos(theta)
+                        self.y_map += speed * math.sin(theta)
+                        self.status = 'moving_to'
+                    else:
+                        print('move_to:: Terminating movement')
+                        self.x_map = x_target_map
+                        self.y_map = y_target_map
+                        self.status = 'idle'
 
