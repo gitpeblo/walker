@@ -68,6 +68,7 @@ class Player:
             self.y_map += speed
     
     def move_through(self, waypoints):
+        #
         pass
 
     def move_to(self, events, waypoints=[[0, 0]], speed=0.1):
