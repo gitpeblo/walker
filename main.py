@@ -72,12 +72,12 @@ class Game:
         # Moving player:
         self.player.move(keys)
 
+        # Checking if the player has to be moved through waypoints:
+        self.player.move_through(self.events, [[2, 2], [6, 4]], self.world.map_data)
+
         # Checking if the player is over a hole:
         self.player.on_tile = check_player_on_tile(self.player, self.world)
         self.player.drop(self.player.on_tile)
-
-        # Checking if the player has to be moved through waypoints:
-        self.player.move_to(self.events, [[4, 4], [6, 4]])
 
     def draw(self):
         self.display.fill((35,35,35))

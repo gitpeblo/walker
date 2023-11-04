@@ -3,6 +3,10 @@ from pygame.locals import * # keys
 
 import glob
 import math
+import numpy as np
+
+# src:
+from src.astar import astar
 
 class Player:
 
@@ -24,6 +28,8 @@ class Player:
         # is player on a tile?
         self.status = 'idle'
         # either of ['idle', 'moving_to']
+        self.waypoints = None
+        # current waypoints list (only relevant when `status`=='moving_to')
 
         # Loading all sprites:
         self.sprites = self.load_sprites_player('data/images/sprites/player')
@@ -66,12 +72,8 @@ class Player:
         if not on_tile:
             self.x_map += speed
             self.y_map += speed
-    
-    def move_through(self, waypoints):
-        #
-        pass
 
-    def move_to(self, events, waypoints=[[0, 0]], speed=0.1):
+    def move_through(self, events, waypoints=[[0, 0]], map_data=None, speed=1.05):
         '''Moves the player through a list of waypoints.
         
         Parameters
@@ -81,6 +83,8 @@ class Player:
         waypoints : list, optional (default: [[0, 0]])
             List of tuples [x_map, y_map], where each tuple is an intermediate
             target to go through.
+        map_data : list of lists
+            Map data in numerical form (0 = no tile).
         speed : float
             Cruising speed.
         '''
@@ -93,28 +97,70 @@ class Player:
                     self.status = 'moving_to'
 
         if self.status == 'moving_to':
-            for  [x_target_map, y_target_map] in waypoints:
+            
+            # Initialize waypoints, if none is set:
+            if self.waypoints is None: 
+                self.waypoints = waypoints
+            
+            x_target_map, y_target_map = self.waypoints[0]
+            # NOTE: The current waypoint is always the first in the list, and
+            #       it gets dropped when it is reached.
 
-                print('====', x_target_map, y_target_map)
 
-                # Calculating direction of movement:
-                dx = x_target_map - self.x_map
-                dy = y_target_map - self.x_map
-                d = (dx**2 + dy**2)**0.5
-                theta = math.atan2(dy, dx)
+            # Inverting map to AStar expected input:
+            map_astar = np.array(map_data, dtype=np.uint8).T
+            # map's x and y get inverted in numpy, hence the transpose
+            map_astar = 1 - map_astar
+           
+            # Deal with integers !!!!!!!!!!!!!!
+            # Deal with integers !!!!!!!!!!!!!!
+            # Deal with integers !!!!!!!!!!!!!!
+            # Deal with integers !!!!!!!!!!!!!!
+            # Deal with integers !!!!!!!!!!!!!!
+            # Deal with integers !!!!!!!!!!!!!!
+            # Deal with integers !!!!!!!!!!!!!!
+            # Deal with integers !!!!!!!!!!!!!!
+            start = (int(self.x_map), int(self.y_map))
+            goal  = (int(x_target_map), int(y_target_map))
+            print('\tmove_to:: start %s | goal %s' % (start, goal))
+            path = astar(map_astar, start, goal)
 
-                if self.status == 'moving_to':
+            print('\tmove_to:: path', path)
+            # Check the target tile is not empty, or it gets stuck!!!
+            # Check the target tile is not empty, or it gets stuck!!!
+            # Check the target tile is not empty, or it gets stuck!!!
+            # Check the target tile is not empty, or it gets stuck!!!
+            # Check the target tile is not empty, or it gets stuck!!!
+            # Check the target tile is not empty, or it gets stuck!!!
+            # Check the target tile is not empty, or it gets stuck!!!
 
-                    if d > speed:
-                    # NOTE: `d` and `speed` have the same units of space, here, because
-                    #        the speed is implictly multiplied by the clock tick.
-                        print('\tmove_to:: Taking a step')
-                        self.x_map += speed * math.cos(theta)
-                        self.y_map += speed * math.sin(theta)
-                        self.status = 'moving_to'
-                    else:
-                        print('move_to:: Terminating movement')
-                        self.x_map = x_target_map
-                        self.y_map = y_target_map
-                        self.status = 'idle'
+
+
+            # Calculating direction of movement:
+            dx = x_target_map - self.x_map
+            dy = y_target_map - self.y_map
+            d = (dx**2 + dy**2)**0.5
+            # distance from current waypoint
+            theta = math.atan2(dy, dx)
+
+            print('\tmove_to:: (x, y): %.2f %.2f --> %.2f %.2f d=%.2f' % \
+                  (self.x_map, self.y_map, x_target_map, y_target_map, d))
+
+            if d > speed:
+            # NOTE: `d` and `speed` have the same units of space, here, because
+            #        the speed is implictly multiplied by the clock tick.
+                print('\tmove_to:: Taking a step')
+                self.x_map += speed * math.cos(theta)
+                self.y_map += speed * math.sin(theta)
+                self.status = 'moving_to'
+            else:
+                # Drop first iteator element:
+                self.waypoints.pop(0)
+                if self.waypoints:
+                    print('move_to:: New waypoint: %s' % self.waypoints[0])
+                else:
+                    print('move_to:: Terminating movement')
+                    self.x_map = x_target_map
+                    self.y_map = y_target_map
+                    self.status = 'idle'
 
