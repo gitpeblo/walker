@@ -3,6 +3,10 @@ import pygame
 import numpy as np
 import glob
 import pandas as pd
+import os
+
+# src:
+from src.map_generators import create_simple_map, write_map_to_file
 
 class World:
     '''
@@ -11,6 +15,9 @@ class World:
     def __init__(self, main):
         self.main = main
         
+        self.path_tmp = 'data/tmp'
+        if not os.path.exists(self.path_tmp): os.makedirs(self.path_tmp) 
+
         self.load_map('data/maps/map_test.txt')
         self.load_sprites_maps('data/images/sprites/maps')
 
@@ -55,6 +62,36 @@ class World:
                 'stride_dy': df_meta['stride_dy'].values[0],
             }
 
+    def generate_map(self, width, height, type='simple', load=True):
+        '''
+        Invokes a map generator and stores the map in the relevant folder.
+        
+        Pramaters
+        ---------
+        width : int
+            Desired map width in pixels.
+        height : int
+            Desired map height in pixels.
+        type : str (default: 'simple')
+            Type of map to be generated, used to invoke different generators:
+            - 'simple': `create_simple_map`
+        load : bool (default: True)
+            If True, loads the generated map and replaces the existing one.
+        '''
+        
+        self.path_tmp_maps = self.path_tmp + '/maps'
+        if not os.path.exists(self.path_tmp_maps):
+            print('generate_map:: %s created' % self.path_tmp_maps)
+            os.makedirs(self.path_tmp_maps) 
 
+        if type == 'simple':
+            map_data = create_simple_map(width, height, p_hole=0.2)
 
+        # Write map to file:
+        path_to_basename = self.path_tmp_maps+'/map.txt'
+        # path to basename file: it will be renamed with sequential integers
+        # (i.e., ..._0.txt, ..._1.txt, etc.), according to the already existing
+        # maps in the target folder.
+        path_to_map = write_map_to_file(map_data, path_to_basename)
 
+#        if load: self.load_map(path_to_map)

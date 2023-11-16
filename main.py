@@ -29,13 +29,13 @@ class Game:
         self.world = world.World(self)
         
         # Player control object:
-        self.player_offset_x = self.world.map_unit_dx/2 - 14/2 # == half tile - half player
-        self.player_offset_y = -21 + 5 # == base of the player at a tile stride from top of tile
+        #self.player_offset_x = self.world.map_unit_dx/2 - 14/2 # == half tile - half player
+        #self.player_offset_y = -21 + 5 # == base of the player at a tile stride from top of tile
         # offset to align player with the center of the "surface" of a tile
         self.player = Player(self, spawn_x_map=0, spawn_y_map=0)
 
         # Utilities:
-        self.done = False  # A flag for the game loop indicating if the game is done playing.
+        self.done = False  # A flag for the game loop indicating if the game is done playing
         self.clock = pygame.time.Clock() # Clock to control the framerate
 
     def loop(self):
@@ -45,7 +45,7 @@ class Game:
             for event in self.events:
                if event.type == pygame.QUIT:
                     self.done = True
-            if event.type == KEYDOWN:
+            if event.type == KEYDOWN: # TODO: need an indent?
                 if event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
@@ -69,8 +69,17 @@ class Game:
 
         keys = pygame.key.get_pressed()
 
+        # Check if a new map shall be generated:
+        if keys[pygame.K_m]:
+            self.world.generate_map(15, 15)
+            # Add a small delay to prevent multiple press detections:
+            pygame.time.delay(100)
+            # delay in milliseconds
+
         # Moving player:
         self.player.move(keys)
+
+        # TODO: Use key parser rather than allow decisions inside methods
 
         # Checking if the player has to be moved through waypoints:
         waypoints = self.player.find_path(6, 14, map_data=self.world.map_data,\
