@@ -71,7 +71,7 @@ class Game:
 
         # Check if a new map shall be generated:
         if keys[pygame.K_m]:
-            self.world.generate_map(15, 15)
+            self.world.generate_map(15, 15, type='traversable')
             # Add a small delay to prevent multiple press detections:
             pygame.time.delay(100)
             # delay in milliseconds
@@ -82,9 +82,11 @@ class Game:
         # TODO: Use key parser rather than allow decisions inside methods
 
         # Checking if the player has to be moved through waypoints:
-        waypoints = self.player.find_path(6, 14, map_data=self.world.map_data,\
-                                          method='AStar')
-        self.player.move_through(self.events, waypoints)
+        if check_player_on_tile(self.player, self.world):
+        # skipping if player is free falling
+            waypoints = self.player.find_path(6, 14,
+                            map_data=self.world.map_data, method='AStar')
+            self.player.move_through(self.events, waypoints)
 
         # Checking if the player is currently over a hole:
         self.player.on_tile = check_player_on_tile(self.player, self.world)
@@ -93,14 +95,16 @@ class Game:
     def draw(self):
         self.display.fill((35,35,35))
 
+        box_dx_mini, box_dy_mini = 7, 7
+        # minimap box sizes
+        # TODO: Move to external file
+
         for y_map, x_map in self.world.coordinates:
 
             if self.world.map_data[y_map][x_map]:
             # there is a "1" in the map
 
                 # Minimap -----------------------------------------------------
-                box_dx_mini, box_dy_mini = 7, 7
-                # minimap box sizes
                 pygame.draw.rect(self.display, (255, 255, 255),\
                     pygame.Rect(x_map*box_dx_mini, y_map*box_dy_mini,\
                                 box_dx_mini, box_dy_mini), 1)
