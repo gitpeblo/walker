@@ -2,7 +2,7 @@ import random
 import numpy as np
 import os
 
-def create_simple_map(width, height, p_hole=0.2):
+def create_simple_map(width, height, p_hole=1):
     '''Generates a map predominantly filled with 1s (tiles), and, in a
      minor amount (less than 50%), 0s (holes).
     
@@ -43,6 +43,64 @@ def create_simple_map(width, height, p_hole=0.2):
                 or (col > 0 and map_data[row, col-1] == 0):
                     continue
                 map_data[row, col] = 0
+
+    return map_data
+
+def create_traversable_map(height, width, p_tile=0.3):
+    '''Generates a left-to-right traversable map, i.e. a map which contains at
+    least one path that crosses the map horizontally.
+    The 1s represent traversable tiles and the 0s represent holes.
+
+    The generation procedure happens in 3 steps:
+        1- A map is initialized only with 0s.
+        2- A guaranteed path is constructed while trasversing the map
+           horizontally.
+        3- Some 0s are additionally randomly replaced by 1s.
+           The predominancy of 1 is can be controlled by the probability to
+           replace a [non-guaranteed-path] hole with a tile (`p_tile`).
+           When `p_tile` is max (=1), all the map locations are tiles (1s).
+
+    Parameters
+    ----------
+    width : int
+        Desired map width in pixels.
+    height : int
+        Desired map height in pixels.
+    p_tile : float, range: [0, 1]
+        Probability to replace [non-guaranteed-path] hole with a tile.
+
+    Returns
+    -------
+    map_data : np.ndarray, dtype: int
+        A 2D array containing 1s and 0s.
+    '''
+
+    waypoints = []
+    # list of [x_map, y_map] waypoints of the traversable path
+
+    # Step 1: Initialize a grid filled with 0s:
+    map_data = np.zeros((height, width), dtype=int)
+
+    # Step 2: Randomly create a guaranteed path, left to right:
+    row = np.random.choice(range(height))
+    # randomly initialize path along the left edge
+    for col in range(width):
+        # Move up, down, or stay in the same row:
+        row += random.choice([-1, 0, 1])
+        # Ensure the path does not go out of the map:
+        row = max(0, min(height - 1, row))
+        # Ensure the path cell is traversable:
+        map_data[row][col] = 1
+        # Store waypoint:
+        waypoints.append([row, col])
+
+    # Step 3: Randomly place some additional traversable tile (1s):
+    for row in range(height):
+        for col in range(width):
+            if map_data[row][col] == 0 and random.random() < p_tile:
+                map_data[row][col] = 1
+
+    # TODO: Return waypoints and use them to get the start and goal
 
     return map_data
 

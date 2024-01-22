@@ -6,7 +6,8 @@ import pandas as pd
 import os
 
 # src:
-from src.map_generators import create_simple_map, write_map_to_file
+from src.map_generators import create_simple_map, create_traversable_map,\
+                               write_map_to_file
 
 class World:
     '''
@@ -75,6 +76,7 @@ class World:
         type : str (default: 'simple')
             Type of map to be generated, used to invoke different generators:
             - 'simple': `create_simple_map`
+            - 'traversable': `create_traversable_map`
         load : bool (default: True)
             If True, loads the generated map and replaces the existing one.
         '''
@@ -85,7 +87,9 @@ class World:
             os.makedirs(self.path_tmp_maps) 
 
         if type == 'simple':
-            map_data = create_simple_map(width, height, p_hole=0.2)
+            map_data = create_simple_map(width, height, p_hole=0.5)
+        if type == 'traversable':
+            map_data = create_traversable_map(width, height, p_tile=0.5)
 
         # Write map to file:
         path_to_basename = self.path_tmp_maps+'/map.txt'
@@ -94,4 +98,4 @@ class World:
         # maps in the target folder.
         path_to_map = write_map_to_file(map_data, path_to_basename)
 
-#        if load: self.load_map(path_to_map)
+        if load: self.load_map(path_to_map)

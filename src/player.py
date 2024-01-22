@@ -155,7 +155,8 @@ class Player:
 
             start = (int(self.x_map), int(self.y_map))
             goal  = (x_target_map, y_target_map)
-            print('\tfind_path:: start %s | goal %s' % (start, goal))
+            # debug:
+            #print('\tfind_path:: start %s | goal %s' % (start, goal))
             
             path = astar(map_astar, start, goal)[1:]
             # NOTE: The first element in the path is dropped, as it is the
@@ -163,7 +164,8 @@ class Player:
 
             # Convert each tuple to a list:
             path = [list(tup) for tup in path]
-            print('\tfind_path:: path\n\t\t%s' % path)
+            # debug:
+            #print('\tfind_path:: path\n\t\t%s' % path)
 
         return path
 
