@@ -84,7 +84,7 @@ class Game:
         # Checking if the player has to be moved through waypoints:
         if check_player_on_tile(self.player, self.world):
         # skipping if player is free falling
-            waypoints = self.player.find_path(6, 14,
+            waypoints = self.player.find_path(6, 13,
                             map_data=self.world.map_data, method='AStar')
             self.player.move_through(self.events, waypoints)
 
