@@ -8,6 +8,8 @@ import src.world as world
 from src.player import Player
 from src.utils import coords_map_to_screen, coords_map_to_mini
 from src.utils import check_player_on_tile
+from src.commands_list import CommandsList
+from src.set_end_point import set_end_point
 
 # The main game class that is intantiated on startup:
 # see https://github.com/lukasz1985/SREM/blob/master/main.py
@@ -24,6 +26,9 @@ class Game:
         self.offset_x = 150
         self.offset_y = 100
         # offset of layer not to overlap with minimap
+
+        # Create a CommandsList instance
+        self.commands_list = CommandsList(self.screen)
         
         # World creation:
         self.world = world.World(self)
@@ -43,12 +48,22 @@ class Game:
 
             self.events = pygame.event.get()
             for event in self.events:
-               if event.type == pygame.QUIT:
-                    self.done = True
-            if event.type == KEYDOWN: # TODO: need an indent?
-                if event.key == K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
+                if event.type == pygame.QUIT:
+                    self.done = True  # Handle quit
+            
+                if event.type == KEYDOWN:
+                    # Request quit                                        
+                    if event.key == K_ESCAPE:
+                        pygame.quit()
+                        sys.exit()
+                    # Capture end point
+                    elif event.key == pygame.K_e:
+                        print("Waiting for mouse click...")
+                        end_x, end_y = set_end_point(self.screen)
+                        print(f"Endpoint set to: ({end_x}, {end_y})")
+                    # Display commands list
+                    elif event.key == pygame.K_TAB:
+                        self.commands_list.toggle_visibility()
             
             # LOGICAL UPDATES #################################################
 
@@ -140,6 +155,14 @@ class Game:
             #------------------------------------------------------------------
                 
         self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
+        
+        # Commands List side panel --------------------------------------------
+        # Draw overlay if visible (as regulated by `toggle_visibility`).
+        '''IMPORTANT: The command list is created on the screen, so invoke
+            this only after the screen is blitted.'''
+        self.commands_list.draw()
+        #----------------------------------------------------------------------
+        
         #pygame.display.update()
         pygame.display.flip()
         # NOTE: Use "flip" over "update", as suggested here: https://www.pygame.org/docs/tut/newbieguide.html
